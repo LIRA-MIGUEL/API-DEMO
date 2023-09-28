@@ -8,7 +8,12 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
+try:
+    with open("contactos.csv", "r") as archivo:
+        contenido = archivo.read()
+        print(contenido)
+        except FileNotFoundError: 
+            print("no funciona")
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
