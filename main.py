@@ -1,10 +1,22 @@
 from fastapi import FastAPI
 import csv
+from fastapi import FastAPI, status
 
 app = FastAPI()
 
-@app.get("/")
-def read_root():
+@app.get(
+    "/",
+    status_code=201,
+    description="Endpoint raiz de la API Contactos",
+    summary="Endpoint Raiz"
+    )
+async def root():
+    """
+    #Endpoint Raiz 
+    ##1-Status codes
+    *289-codigo de muestra 
+    *334-otro estatus de prueba 
+    """
     return {"Hello": "World"}
 
 @app.get("/v1/contactos")
