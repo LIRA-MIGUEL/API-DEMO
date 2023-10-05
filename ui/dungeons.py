@@ -9,6 +9,8 @@ print(f"GET: {response.text}")
 
 response_json = json.loads(response.text)
 
-for ¡ in range[12]:
+for i in range[12]:
 
-print(response_json{}")
+data = response_json['results'][i]
+name = data['name']
+print(f"data: {i + 1}: {name}")
