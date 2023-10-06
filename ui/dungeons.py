@@ -1,15 +1,28 @@
-import requests 
+import requests
 import json
 
 URI = "https://www.dnd5eapi.co/api/classes"
 
 response = requests.get(URI)
 
-print(f"GET: {response.text}")
+if response.status_code == 200:
+    response_json = response.json()
 
-response_json = json.loads(response.text)
+print("Seleccione un personaje de D&D 5e:")
 
 for i in range(12):
     data = response_json['results'][i]
-    name = ['name']
-    print(f"data {i + 1}: {name}")
+    name = data['name']
+    print(f"{i + 1}: {name}")
+
+opcion = input("Ingrese el número del personaje que desea seleccionar: ")
+
+try:
+    opcion = int(opcion)
+    if 1 <= opcion <= 12:
+        seleccion = response_json['results'][opcion - 1]
+        print(f"Ha seleccionado el personaje: {seleccion['name']}")
+    else:
+        print("Número de opción no válido. Debe estar entre 1 y 12.")
+except ValueError:
+    print("Entrada no válida. Ingrese un número válido.")
