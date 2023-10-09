@@ -42,3 +42,19 @@ async def crear_contacto(contacto: ContactoCreate):
         writer.writerow(nuevo_contacto)
     
     return {"mensaje": "Contacto creado con éxito", "contacto": nuevo_contacto}
+
+@app.get("/v1/contactos/{nombre_busqueda}", response_class=JSONResponse)
+async def buscar_contacto(nombre_busqueda: str):
+    datos = []
+#Abre el archivo csv y busca nombres del contacto
+    with open('contactos.csv', 'r', newline='') as file: 
+        fieldnames = ('nombre', 'email')
+        reader = csv.DictReader(file, fieldnames)
+        for row in reader:
+            if row['nombre'] == nombre_busqueda:
+                datos.append(row)
+
+    if not datos: #verifica si la lista esta vacia 
+        raise HTTPException(status_code=404, detail="Contacto no encontrado")
+# si la lista esta vacia se lanza un exception HTTP y manda un not found junto con el mensaje 
+    return datos
