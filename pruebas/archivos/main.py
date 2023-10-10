@@ -1,29 +1,34 @@
-from typing import Annotated
-
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
+import shutil
+from pathlib import Path
 
 app = FastAPI()
 
+# Ruta para guardar las imágenes cargadas
+UPLOAD_DIR = "static/imagenes"
+Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
 
-@app.post("/static/imagenes/imagen1.jpg")
-async def create_files(
-    files: Annotated[list[bytes], File(description="Multiple files as bytes")],
+@app.post("/upload/")
+async def upload_files(
+    files: list[UploadFile] = File(...),
 ):
-    return {"file_sizes": [len(file) for file in files]}
-
-
-
-
+    file_paths = []
+    for uploaded_file in files:
+        file_path = f"{UPLOAD_DIR}/{uploaded_file.filename}"
+        with open(file_path, "wb") as file_object:
+            shutil.copyfileobj(uploaded_file.file, file_object)
+        file_paths.append(file_path)
+    return {"file_paths": file_paths}
 
 @app.get("/")
 async def main():
     content = """
-<body>
-<form action="/static/imagenes/imagen1.jpg" enctype="multipart/form-data" method="post">
-<input name="files" type="file" multiple>
-<input type="submit">
-</form>
-</body>
+    <body>
+    <form action="/upload/" enctype="multipart/form-data" method="post">
+    <input name="files" type="file" multiple>
+    <input type="submit">
+    </form>
+    </body>
     """
     return HTMLResponse(content=content)
