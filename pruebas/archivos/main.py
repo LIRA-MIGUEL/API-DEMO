@@ -1,24 +1,24 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
-import shutil
-from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI()
 
-# Ruta para guardar las imágenes cargadas
-UPLOAD_DIR = "static/imagenes"
-Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
+# Monta la carpeta "static" para servir archivos estáticos
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.post("/upload/")
-async def upload_files(
-    files: list[UploadFile] = File(...),
-):
+async def upload_files(files: list[UploadFile] = File(...)):
     file_paths = []
+    upload_directory = "static/imagenes"  # Directorio donde se guardarán los archivos
+
     for uploaded_file in files:
-        file_path = f"{UPLOAD_DIR}/{uploaded_file.filename}"
+        file_path = os.path.join(upload_directory, uploaded_file.filename)
         with open(file_path, "wb") as file_object:
-            shutil.copyfileobj(uploaded_file.file, file_object)
+            file_object.write(uploaded_file.file.read())
         file_paths.append(file_path)
+
     return {"file_paths": file_paths}
 
 @app.get("/")
